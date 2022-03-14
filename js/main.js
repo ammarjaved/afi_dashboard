@@ -16,9 +16,14 @@ $( document ).ready(function() {
    getSurveyedCountsToday();
    getSurveyedCountsSubmitted();
    getAllUsers();
-   getTimeCounts();
+   var d=formatDate()
+   getTimeCounts(d);
 
     $('#datetimepicker1').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+
+    $('#datetimepicker3').datetimepicker({
         format: 'YYYY-MM-DD'
     });
 
@@ -393,10 +398,10 @@ function getDateCounts(){
 }
 
 
-function getTimeCounts(){
+function getTimeCounts(d){
 
     $.ajax({
-        url: 'services/counts.php?id=time',
+        url: 'services/counts.php?id=time&d='+d,
         dataType: 'JSON',
         method: 'GET',
         async: false,
@@ -559,6 +564,26 @@ $('#link')[0].click();
     // });
 
 }
+
+function formatDate() {
+    var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function filterTimeGraph(){
+    var dp=$("#datetime3").val();
+    getTimeCounts(dp);
+}
+ 
 
 
 $(document).ready(function(){

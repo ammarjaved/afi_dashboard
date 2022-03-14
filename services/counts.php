@@ -148,10 +148,10 @@ class Tehsil extends connection {
                               $this->closeConnection();
                 }  
                 
-                public function getByTime_Users() {                  
+                public function getByTime_Users($date) {                  
                     $sql="select username,updated_at,sum(total) as count from (
                     select b.username,date_part('hour', a.updated_at) as updated_at  ,count(*) as total  from demand_point a inner join 
-                    tbl_user_info b on a.user_id=b.user_id where  a.user_id is not null and updated_at::date=now()::date
+                    tbl_user_info b on a.user_id=b.user_id where  a.user_id is not null and updated_at::date='$date'
                     group by b.username, updated_at order by updated_at
                     ) as foo group by username,updated_at  order by updated_at";
                       $output = array();
@@ -187,7 +187,8 @@ else if($_GET['id']=='submit'){
 }else if($_GET['id']=='users'){
     echo $json->getAll_Users();
 }else if($_GET['id']=='time'){
-    echo $json->getByTime_Users();
+    $t_date=$_GET['d'];
+    echo $json->getByTime_Users($t_date);
 }
 
 
