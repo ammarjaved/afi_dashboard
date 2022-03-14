@@ -15,6 +15,13 @@ $( document ).ready(function() {
    getSurveyedCounts();
    getSurveyedCountsToday();
    getSurveyedCountsSubmitted();
+   getAllUsers();
+   getTimeCounts();
+
+    $('#datetimepicker1').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+
  //  pieChart()
 });
 
@@ -80,6 +87,7 @@ function mainBarChart(cat,series){
             type: 'column'
         },
         credits:false,
+       
         title: {
             text: 'Total Data'
         },
@@ -88,6 +96,12 @@ function mainBarChart(cat,series){
         },
         xAxis: {
             categories:cat,
+            min: 0,
+            max:3,
+            scrollbar:{
+                enabled:true
+              },
+             
             crosshair: true
         },
         yAxis: {
@@ -115,7 +129,56 @@ function mainBarChart(cat,series){
 }
 
 
-function createHighChart(cat,val,id,title,val1){
+function mainBarTimeChart(cat,series){
+    Highcharts.chart('container3', {
+        chart: {
+            type: 'column'
+        },
+        credits:false,
+       
+        title: {
+            text: 'By hour'
+        },
+        subtitle: {
+            text: 'Source:Aerosynergy'
+        },
+        xAxis: {
+            categories:cat,
+            min: 0,
+            max:3,
+            scrollbar:{
+                enabled:true
+              },
+             
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Counts Against User'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: series
+    });
+}
+
+
+
+function createHighChart(cat,val,id,title,val1,val2){
     if(title=='Total Progress'){
         Highcharts.chart(id, {
             xAxis: {
@@ -137,6 +200,11 @@ function createHighChart(cat,val,id,title,val1){
                 name:'submitted',
                 data: val1,
                 color:'green'        
+    
+            },{
+                name:'black points',
+                data: val2,
+                color:'black'        
     
             }]
         });
@@ -185,6 +253,7 @@ function getTotalCounts(){
             var val=[];
             var cat1=[];
             var val1=[];
+            var val2=[];
            for(var i=0;i<data.total.length;i++){
             cat.push(data.total[i].username)
              val.push(parseInt(data.total[i].count))
@@ -197,6 +266,7 @@ function getTotalCounts(){
             for(var j=0;j<cat.length;j++){
                // if(cat[j]==data.submitted[j].username){
                    var a=0;
+                   var b=0;
                    for(var m=0;m<data.submitted.length;m++){
                     if(cat[j]==data.submitted[m].username){
                     val1.push(parseInt(data.submitted[m].count));
@@ -210,13 +280,27 @@ function getTotalCounts(){
                     }
     
                    } 
+
+                   for(var n=0;n<data.black.length;n++){
+                    if(cat[j]==data.black[n].username){
+                    val2.push(parseInt(data.black[n].count));
+                    }else if(cat1.includes(cat[j])==true){
+                        continue;
+                    }else{
+                        if(b==0){
+                        val2.push(0);
+                        b=1;
+                        }
+                    }
+    
+                   } 
                    
                // }
                 
             }   
            
           // }
-           createHighChart(cat,val,'container','Total Progress',val1)
+           createHighChart(cat,val,'container','Total Progress',val1,val2)
 
         }
     });
@@ -308,6 +392,71 @@ function getDateCounts(){
 
 }
 
+
+function getTimeCounts(){
+
+    $.ajax({
+        url: 'services/counts.php?id=time',
+        dataType: 'JSON',
+        method: 'GET',
+        async: false,
+        success: function callback(data) {
+            debugger
+            console.log(data)
+            var series=[];
+            var temp=[];
+            var cat=[];
+            for(var k=0;k<data.length;k++){
+                if(cat.includes(data[k].updated_at)==false){
+                    cat.push(data[k].updated_at)
+                }
+            }
+            for(var i=0;i<data.length;i++){
+                // if(cat.includes(data[i].updated_at)==false){
+                //     cat.push(data[i].updated_at)
+                // }
+                var username=data[i].username;
+            if(temp.includes(username)==true){
+                continue;
+            }else{   
+                temp.push(username); 
+                var obj={};
+                obj.name=username;
+                var arr=[]
+                for(var j=0;j<data.length;j++){
+                    if(data[j].username==username){
+                         var len=0;
+                         if(arr.length>0){
+                             len=arr.length;
+                         }
+                        //if(data[j].updated_at==cat[len]){
+                        var index = cat.indexOf(data[j].updated_at);
+                        if(index>len){
+                        for(g=len;g<index;g++){    
+                        arr.push(0)
+                        }
+                        arr.push(parseInt(data[j].count));
+                        }else{
+                            arr.push(parseInt(data[j].count));
+                        }
+                        // }else{
+                        //     arr.push(0)
+                        // }
+                    }
+                    
+                }
+                obj.data=arr;
+                series.push(obj)
+            }
+            }
+            mainBarTimeChart(cat,series)
+           
+           
+        }
+    });
+
+}
+
 function getSurveyedCounts(){
 
     $.ajax({
@@ -350,7 +499,7 @@ function getSurveyedCountsSubmitted(){
         async: false,
         success: function callback(data) {
 
-         totalsubmitted1=(10000-parseInt(data[0].count))/100;
+         totalsubmitted1=(parseInt(data[0].count))*100/10000;
          var total_not_submitted=(parseInt(totalsurveyed1)-parseInt(data[0].count))*100/10000
          totalremaining=100-(totalsubmitted1+total_not_submitted);
          pieChart(totalsubmitted1,total_not_submitted,totalremaining)
@@ -364,6 +513,57 @@ function getSurveyedCountsSubmitted(){
 
 }
 
+function getAllUsers(){
+
+    $.ajax({
+        url: 'services/counts.php?id=users',
+        dataType: 'JSON',
+        method: 'GET',
+        async: false,
+        success: function callback(data) {
+        var str='<option>select option</option>'
+        for(var i=0;i<data.length;i++){
+            str=str+'<option value="'+data[i].user_id+'">'+data[i].username+'</option>';
+        }    
+        $("#users00").html(str)
+
+        }
+    });
+
+}
+
+getSelectval='';
+
+function downloadCSV(){
+    var dp=$("#datetime1").val();
+  //  alert(dp);
+    var user=getSelectval;
+
+    $('body').append('<a id="link" href="services/ExportExcel.php?user='+user+'&date='+dp+'">&nbsp;</a>');
+$('#link')[0].click();
+    //alert(user);
+
+    // $.ajax({
+    //     url: 'services/ExportExcel.php?yser='+user+'&date='+dp,
+    //     dataType: 'JSON',
+    //     method: 'GET',
+    //     async: false,
+    //     success: function callback(data) {
+    //     var str='<option>select option</option>'
+    //     for(var i=0;i<data.length;i++){
+    //         str=str+'<option value="'+data[i].user_id+'">'+data[i].username+'</option>';
+    //     }    
+    //     $("#users").html(str)
+
+    //     }
+    // });
+
+}
 
 
-
+$(document).ready(function(){
+$("#users00").change(function(){
+     getSelectval = $(this).children("option:selected").val();
+    
+});
+});

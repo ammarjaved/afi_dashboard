@@ -14,7 +14,7 @@ class Tehsil extends connection {
     public function getAllCounts() {
 
   //   $sql="select date_created::date,count(*) from demand_point where  date_created::date<>'2021-12-01' group by date_created::date order by date_created::date";where  a.date_created::date<>'2021-12-01'
-      $sql="select b.username,count(*) from demand_point a inner join tbl_user_info b on a.user_id=b.user_id  group by b.username";
+      $sql="select b.username,count(*) from demand_point a inner join tbl_user_info b on a.user_id=b.user_id  and is_not_surveyed<>'Yes' group by b.username";
         $output = array();
         $result_query = pg_query($sql);
         if ($result_query) {
@@ -29,6 +29,15 @@ class Tehsil extends connection {
         if ($result_query) {
             $arrq = pg_fetch_all($result_query);
             $output['submitted']= $arrq;
+                    
+        }
+
+        $sql="select  b.username,count(*) from demand_point a  ,tbl_user_info b  where is_not_surveyed='Yes' and a.user_id=b.user_id group by b.username";
+        //$output = array();
+        $result_query = pg_query($sql);
+        if ($result_query) {
+            $arrq = pg_fetch_all($result_query);
+            $output['black']= $arrq;
                     
         }
 
@@ -109,7 +118,7 @@ class Tehsil extends connection {
                     public function getTotal_submitted() {
 
                             //   $sql="select date_created::date,count(*) from demand_point where  date_created::date<>'2021-12-01' group by date_created::date order by date_created::date";
-                                $sql="select count(*) from demand_point where data_submited is not null";
+                                $sql="select count(*) from demand_point where data_submited='submitted'";
                                   $output = array();
                                   $result_query = pg_query($sql);
                                   if ($result_query) {
@@ -121,7 +130,42 @@ class Tehsil extends connection {
                                   return json_encode($output);
                           
                                   $this->closeConnection();
-                    }          
+                    }    
+                    
+                    public function getAll_Users() {
+
+                            $sql="select user_id,username from tbl_user_info order by  username";
+                              $output = array();
+                              $result_query = pg_query($sql);
+                              if ($result_query) {
+                                  $arrq = pg_fetch_all($result_query);
+                                  $output= $arrq;
+                                          
+                              }
+                      
+                              return json_encode($output);
+                      
+                              $this->closeConnection();
+                }  
+                
+                public function getByTime_Users() {                  
+                    $sql="select username,updated_at,sum(total) as count from (
+                    select b.username,date_part('hour', a.updated_at) as updated_at  ,count(*) as total  from demand_point a inner join 
+                    tbl_user_info b on a.user_id=b.user_id where  a.user_id is not null and updated_at::date=now()::date
+                    group by b.username, updated_at order by updated_at
+                    ) as foo group by username,updated_at  order by updated_at";
+                      $output = array();
+                      $result_query = pg_query($sql);
+                      if ($result_query) {
+                          $arrq = pg_fetch_all($result_query);
+                          $output= $arrq;
+                                  
+                      }
+              
+                      return json_encode($output);
+              
+                      $this->closeConnection();
+        }       
 }
 
 $json = new Tehsil();
@@ -140,6 +184,11 @@ else if($_GET['id']=='today_survey'){
 }
 else if($_GET['id']=='submit'){
     echo $json->getTotal_submitted();
+}else if($_GET['id']=='users'){
+    echo $json->getAll_Users();
+}else if($_GET['id']=='time'){
+    echo $json->getByTime_Users();
 }
+
 
 
