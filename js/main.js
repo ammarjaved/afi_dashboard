@@ -15,6 +15,7 @@ $( document ).ready(function() {
    getSurveyedCounts();
    getSurveyedCountsToday();
    getSurveyedCountsSubmitted();
+   getSurveyedBlackCountsToday();
    getAllUsers();
    var d=formatDate()
    getTimeCounts(d);
@@ -489,6 +490,22 @@ function getSurveyedCountsToday(){
         success: function callback(data) {
 
         $("#total_count_today").html(data[0].count)
+
+        }
+    });
+
+}
+
+function getSurveyedBlackCountsToday(){
+
+    $.ajax({
+        url: 'services/counts.php?id=today_black_survey',
+        dataType: 'JSON',
+        method: 'GET',
+        async: false,
+        success: function callback(data) {
+
+        $("#black_count_today").html(data[0].count)
 
         }
     });
