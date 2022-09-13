@@ -20,10 +20,10 @@ class ExportExcel extends connection
         $date=$_REQUEST['date'];
         $rand=rand();
         $filename=$user.'_'.$date. $rand.".xls";
-        if (!file_exists("../../".$user."_".$date)) {
+        //if (!file_exists("../../".$user."_".$date)) {
          
-            mkdir("./" . $user . "_" . $date.'-'.$rand);
-        }
+        //    mkdir("./" . $user . "_" . $date.'-'.$rand);
+       // }
 
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header("Content-Type: application/vnd.ms-excel");

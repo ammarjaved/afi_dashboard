@@ -504,8 +504,8 @@ function getSurveyedCountsSubmitted(){
         async: false,
         success: function callback(data) {
 
-         totalsubmitted1=(parseInt(data[0].count))*100/10000;
-         var total_not_submitted=(parseInt(totalsurveyed1)-parseInt(data[0].count))*100/10000
+         totalsubmitted1=(parseInt(data[0].count))*100/50000;
+         var total_not_submitted=(parseInt(totalsurveyed1)-parseInt(data[0].count))*100/50000
          totalremaining=100-(totalsubmitted1+total_not_submitted);
          pieChart(totalsubmitted1,total_not_submitted,totalremaining)
 
