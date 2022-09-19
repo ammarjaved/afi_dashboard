@@ -130,7 +130,24 @@ class Tehsil extends connection {
                               return json_encode($output);
                       
                               $this->closeConnection();
-                    }    
+                    }
+                    
+                    public function getTotal_Blackpoint() {
+
+                        //   $sql="select date_created::date,count(*) from demand_point where  date_created::date<>'2021-12-01' group by date_created::date order by date_created::date";
+                            $sql="select count(*) from demand_point where phase is null or phase =''";
+                              $output = array();
+                              $result_query = pg_query($sql);
+                              if ($result_query) {
+                                  $arrq = pg_fetch_all($result_query);
+                                  $output= $arrq;
+                                          
+                              }
+                      
+                              return json_encode($output);
+                      
+                              $this->closeConnection();
+                    }
 
                     public function getTotal_submitted() {
 
@@ -204,7 +221,9 @@ else if($_GET['id']=='today_survey'){
 else if($_GET['id']=='today_black_survey'){
     echo $json->getBlack_DoneToday();
 }
-else if($_GET['id']=='submit'){
+else if($_GET['id']=='total_black_survey'){
+    echo $json->getTotal_Blackpoint();
+}else if($_GET['id']=='submit'){
     echo $json->getTotal_submitted();
 }else if($_GET['id']=='users'){
     echo $json->getAll_Users();

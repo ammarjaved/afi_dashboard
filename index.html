@@ -36,7 +36,7 @@
 
           <div class="col-md-4">
           <div class="form-group">
-            <label for="sel1">select date:</label>
+            <label for="sel1">Select date:</label>
             <div class='input-group date' id='datetimepicker1'>
                <input id="datetime1" type='text' class="form-control" />
                <span class="input-group-addon">
@@ -57,25 +57,39 @@
        
        </div>
     <div class="row">
-     <div class="col-md-3">
-     <div class="btn btn-primary" style="width: 100%;height: 70px">
-        <span>Total Surveyed</span><br /><span id="total_count"></span></div>
-     </div>
-     <div class="col-md-3">
-        <div class="btn btn-warning" style="width: 100%;height: 70px">
+
+    <div class="col-sm-3">
+        <div class="btn btn-success" style="width: 100%;height: 70px">
+        <span>Total Submitted</span><br /><span id="total_submitted"></span>
+    </div>
+    </div> 
+
+    <div class="col-sm-3">
+    <div class="row">
+    <div class="col-sm-12">        
+     <div class="btn btn-primary" style="width: 100%;height: 30px">
+        <span style="padding-right:20px ;">Total Surveyed</span><span id="total_count"></span>
+    </div>
+    </div>
+    <div class="col-sm-12" style="padding-top:10px ;">
+    <div class="btn btn-warning" style="width: 100%;height: 30px">
+        <span style="padding-right:20px ;">Total Black Point</span><span id="total_black_count"></span>
+    </div>
+    </div>
+    </div>
+    </div>
+
+     <div class="col-sm-3">
+        <div class="btn btn-danger" style="width: 100%;height: 70px">
             <span>Black Point Today</span><br /><span id="black_count_today"></span>
         </div>
      </div>
-     <div class="col-md-3">
-        <div class="btn btn-danger" style="width: 100%;height: 70px">
+     <div class="col-sm-3">
+        <div class="btn btn-info" style="width: 100%;height: 70px">
             <span>Surveyed Today</span><br /><span id="total_count_today"></span>
         </div>
      </div>
-     <div class="col-md-3">
-        <div class="btn btn-success" style="width: 100%;height: 70px">
-            <span>Total Submitted</span><br /><span id="total_submitted"></span>
-        </div>
-     </div>
+    
     
     </div>
     <div class="row">
